@@ -45,6 +45,8 @@ type _ExcalidrawElementBase = Readonly<{
   groupIds: readonly GroupId[];
   /** Ids of (linear) elements that are bound to this element. */
   boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
+  /** epoch (ms) timestamp of last element update */
+  updated: number;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -62,6 +64,21 @@ export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
 export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
+
+export type ExcalidrawImageElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "image";
+    fileId: FileId | null;
+    /** whether respective file is persisted */
+    status: "pending" | "saved" | "error";
+    /** X and Y scale factors <-1, 1>, used for image axis flipping */
+    scale: [number, number];
+  }>;
+
+export type InitializedExcalidrawImageElement = MarkNonNullable<
+  ExcalidrawImageElement,
+  "fileId"
+>;
 
 /**
  * These are elements that don't have any additional properties.
@@ -81,10 +98,11 @@ export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
-  | ExcalidrawFreeDrawElement;
+  | ExcalidrawFreeDrawElement
+  | ExcalidrawImageElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
-  isDeleted: false;
+  isDeleted: boolean;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
@@ -104,7 +122,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawTextElement;
+  | ExcalidrawTextElement
+  | ExcalidrawImageElement;
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
@@ -112,7 +131,7 @@ export type PointBinding = {
   gap: number;
 };
 
-export type Arrowhead = "arrow" | "bar" | "dot";
+export type Arrowhead = "arrow" | "bar" | "dot" | "triangle";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
@@ -133,3 +152,5 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     simulatePressure: boolean;
     lastCommittedPoint: Point | null;
   }>;
+
+export type FileId = string & { _brand: "FileId" };

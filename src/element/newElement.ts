@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawTextElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
@@ -11,7 +12,7 @@ import {
   ExcalidrawFreeDrawElement,
   FontFamilyValues,
 } from "../element/types";
-import { measureText, getFontString } from "../utils";
+import { measureText, getFontString, getUpdatedTimestamp } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -21,7 +22,7 @@ import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 
 type ElementConstructorOpts = MarkOptional<
-  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted">,
+  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
   | "angle"
@@ -74,6 +75,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
   versionNonce: rest.versionNonce ?? 0,
   isDeleted: false as false,
   boundElementIds,
+  updated: getUpdatedTimestamp(),
 });
 
 export const newElement = (
@@ -248,6 +250,22 @@ export const newLinearElement = (
   };
 };
 
+export const newImageElement = (
+  opts: {
+    type: ExcalidrawImageElement["type"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawImageElement> => {
+  return {
+    ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    // in the future we'll support changing stroke color for some SVG elements,
+    // and `transparent` will likely mean "use original colors of the image"
+    strokeColor: "transparent",
+    status: "pending",
+    fileId: null,
+    scale: [1, 1],
+  };
+};
+
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
 // (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
@@ -320,6 +338,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   } else {
     copy.id = randomId();
   }
+  copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,
