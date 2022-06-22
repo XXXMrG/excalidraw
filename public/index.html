@@ -52,6 +52,25 @@
       content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
 
+    <script>
+      // Redirect Excalidraw+ users which have auto-redirect enabled.
+      //
+      // Redirect only the bare root path, so link/room/library urls are not
+      // redirected.
+      //
+      // Putting into index.html for best performance (can't redirect on server
+      // due to location.hash checks).
+      if (
+        window.location.pathname === "/" &&
+        !window.location.hash &&
+        !window.location.search &&
+        // if its present redirect
+        document.cookie.includes("excplus-autoredirect=true")
+      ) {
+        window.location.href = "https://app.excalidraw.com";
+      }
+    </script>
+
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
     <!-- Excalidraw version -->
@@ -69,12 +88,6 @@
       href="Cascadia.woff2"
       as="font"
       type="font/woff2"
-      crossorigin="anonymous"
-    />
-
-    <link
-      href="%REACT_APP_SOCKET_SERVER_URL%/socket.io"
-      rel="preconnect"
       crossorigin="anonymous"
     />
 
@@ -130,26 +143,6 @@
         user-select: none;
       }
 
-      .LoadingMessage {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-      }
-
-      .LoadingMessage span {
-        background-color: var(--button-gray-1);
-        border-radius: 5px;
-        padding: 0.8em 1.2em;
-        color: var(--popup-text-color);
-        font-size: 1.3em;
-      }
       #root {
         height: 100%;
         -webkit-touch-callout: none;
@@ -158,8 +151,10 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+      }
 
-        @media screen and (min-width: 1200px) {
+      @media screen and (min-width: 1200px) {
+        #root {
           -webkit-touch-callout: default;
           -webkit-user-select: auto;
           -khtml-user-select: auto;
@@ -176,10 +171,6 @@
     <header>
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
-    <div id="root">
-      <div class="LoadingMessage">
-        <span>Loading scene...</span>
-      </div>
-    </div>
+    <div id="root"></div>
   </body>
 </html>

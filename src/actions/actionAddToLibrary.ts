@@ -7,8 +7,14 @@ import { t } from "../i18n";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
+  trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
-    if (elements.some((element) => element.type === "image")) {
+    const selectedElements = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+      true,
+    );
+    if (selectedElements.some((element) => element.type === "image")) {
       return {
         commitToHistory: false,
         appState: {
@@ -19,16 +25,13 @@ export const actionAddToLibrary = register({
     }
 
     return app.library
-      .loadLibrary()
+      .getLatestLibrary()
       .then((items) => {
-        return app.library.saveLibrary([
+        return app.library.setLibrary([
           {
             id: randomId(),
             status: "unpublished",
-            elements: getSelectedElements(
-              getNonDeletedElements(elements),
-              appState,
-            ).map(deepCopyElement),
+            elements: selectedElements.map(deepCopyElement),
             created: Date.now(),
           },
           ...items,

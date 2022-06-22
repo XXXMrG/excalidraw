@@ -1,10 +1,11 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { selectGroupsForSelectedElements } from "../groups";
-import { getNonDeletedElements } from "../element";
+import { getNonDeletedElements, isTextElement } from "../element";
 
 export const actionSelectAll = register({
   name: "selectAll",
+  trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
     if (appState.editingLinearElement) {
       return false;
@@ -15,7 +16,11 @@ export const actionSelectAll = register({
           ...appState,
           editingGroupId: null,
           selectedElementIds: elements.reduce((map, element) => {
-            if (!element.isDeleted) {
+            if (
+              !element.isDeleted &&
+              !(isTextElement(element) && element.containerId) &&
+              element.locked === false
+            ) {
               map[element.id] = true;
             }
             return map;

@@ -9,6 +9,7 @@
     "copy": "نسخ",
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
+    "copyText": "نسخ إلى الحافظة كنص",
     "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
@@ -21,7 +22,7 @@
     "fill": "التعبئة",
     "strokeWidth": "سُمك الخط",
     "strokeStyle": "نمط الخط",
-    "strokeStyle_solid": "كامل",
+    "strokeStyle_solid": "متصل",
     "strokeStyle_dashed": "متقطع",
     "strokeStyle_dotted": "منقط",
     "sloppiness": "الإمالة",
@@ -64,6 +65,7 @@
     "cartoonist": "كرتوني",
     "fileTitle": "إسم الملف",
     "colorPicker": "منتقي اللون",
+    "canvasColors": "",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
     "layers": "الطبقات",
@@ -101,8 +103,24 @@
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
     "toggleTheme": "غير النمط",
-    "personalLib": "",
-    "excalidrawLib": ""
+    "personalLib": "المكتبة الشخصية",
+    "excalidrawLib": "مكتبتنا",
+    "decreaseFontSize": "تصغير حجم الخط",
+    "increaseFontSize": "تكبير حجم الخط",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "تعديل الرابط",
+      "create": "إنشاء رابط",
+      "label": "رابط"
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -138,10 +156,10 @@
     "exitZenMode": "إلغاء الوضع الليلى",
     "cancel": "إلغاء",
     "clear": "مسح",
-    "remove": "",
-    "publishLibrary": "",
-    "submit": "",
-    "confirm": ""
+    "remove": "إزالة",
+    "publishLibrary": "انشر",
+    "submit": "أرسل",
+    "confirm": "تأكيد"
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -150,20 +168,19 @@
     "couldNotLoadInvalidFile": "تعذر التحميل، الملف غير صالح",
     "importBackendFailed": "فشل الاستيراد من الخادوم.",
     "cannotExportEmptyCanvas": "لا يمكن تصدير لوحة فارغة.",
-    "couldNotCopyToClipboard": "تعذر النسخ إلى الحافظة. حاول استخدام متصفح Chrome.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "تعذر فك تشفير البيانات.",
     "uploadedSecurly": "تم تأمين التحميل بتشفير النهاية إلى النهاية، مما يعني أن خادوم Excalidraw والأطراف الثالثة لا يمكنها قراءة المحتوى.",
     "loadSceneOverridePrompt": "تحميل الرسم الخارجي سيحل محل المحتوى الموجود لديك. هل ترغب في المتابعة؟",
     "collabStopOverridePrompt": "إيقاف الجلسة سيؤدي إلى الكتابة فوق رسومك السابقة المخزنة داخليا. هل أنت متأكد؟\n\n(إذا كنت ترغب في الاحتفاظ برسمك المخزن داخليا، ببساطة أغلق علامة تبويب المتصفح بدلاً من ذلك.)",
-    "errorLoadingLibrary": "حصل خطأ أثناء تحميل مكتبة الطرف الثالث.",
     "errorAddingToLibrary": "تعذر إضافة العنصر للمكتبة",
     "errorRemovingFromLibrary": "تعذر إزالة العنصر من المكتبة",
     "confirmAddLibrary": "هذا سيضيف {{numShapes}} شكل إلى مكتبتك. هل أنت متأكد؟",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "يبدو أن هذه الصورة لا تحتوي على أي بيانات مشهد. هل قمت بتمكين تضمين المشهد أثناء التصدير؟",
     "cannotRestoreFromImage": "تعذر استعادة المشهد من ملف الصورة",
     "invalidSceneUrl": "تعذر استيراد المشهد من عنوان URL المتوفر. إما أنها مشوهة، أو لا تحتوي على بيانات Excalidraw JSON صالحة.",
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل."
   },
   "errors": {
@@ -171,7 +188,9 @@
     "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
-    "invalidSVGString": ""
+    "invalidSVGString": "SVG غير صالح.",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "تحديد",
@@ -184,7 +203,10 @@
     "freedraw": "رسم",
     "text": "نص",
     "library": "مكتبة",
-    "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم"
+    "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
+    "penMode": "",
+    "link": "",
+    "eraser": "ممحاة"
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -192,7 +214,7 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "لتحريك لوحة الرسم ، استمر في الضغط على عجلة الماوس أو مفتاح المسافة أثناء السحب",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
@@ -204,10 +226,13 @@
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
     "lineEditor_info": "انقر نقراً مزدوجاً أو اضغط Enter لتعديل النقاط",
-    "lineEditor_pointSelected": "اضغط على حذف لإزالة النقطة، Ctrl Or Cmd+D للتكرار، أو اسحب للانتقال",
-    "lineEditor_nothingSelected": "حدد نقطة لتحريك أو إزالتها، أو اضغط Alt ثم انقر لإضافة نقاط جديدة",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "نشر مكتبتك",
+    "bindTextToElement": "",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -254,6 +279,8 @@
   "helpDialog": {
     "blog": "اقرأ مدونتنا",
     "click": "انقر",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "سهم مائل",
     "curvedLine": "خط مائل",
     "documentation": "دليل الاستخدام",
@@ -265,65 +292,67 @@
     "howto": "اتبع التعليمات",
     "or": "أو",
     "preventBinding": "منع ارتبط السهم",
-    "shapes": "أشكال",
+    "tools": "الأدوات",
     "shortcuts": "اختصارات لوحة المفاتيح",
     "textFinish": "إنهاء التعديل (محرر النص)",
     "textNewLine": "أضف سطر جديد (محرر نص)",
     "title": "المساعدة",
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
-    "zoomToSelection": "تكبير للعنصر المحدد"
+    "zoomToSelection": "تكبير للعنصر المحدد",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "مسح اللوحة"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "نشر المكتبة",
+    "itemName": "إسم العنصر",
+    "authorName": "إسم المؤلف",
+    "githubUsername": "اسم المستخدم في جيت هب",
+    "twitterUsername": "اسم المستخدم في تويتر",
+    "libraryName": "اسم المكتبة",
+    "libraryDesc": "وصف المكتبة",
+    "website": "الموقع",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
+      "authorName": "اسمك أو اسم المستخدم",
+      "libraryName": "اسم مكتبتك",
+      "libraryDesc": "وصف مكتبتك لمساعدة الناس على فهم استخدامها",
       "githubHandle": "",
       "twitterHandle": "",
       "website": ""
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "مطلوب",
+      "website": "أدخل عنوان URL صالح"
     },
     "noteDescription": {
       "pre": "",
-      "link": "",
-      "post": ""
+      "link": "مستودع المكتبة العامة",
+      "post": "ليستخدمها الآخرون في رسوماتهم."
     },
     "noteGuidelines": {
-      "pre": "",
-      "link": "",
+      "pre": "يجب الموافقة على المكتبة يدويًا أولاً. يرجى قراءة ",
+      "link": "الإرشادات",
       "post": ""
     },
     "noteLicense": {
       "pre": "",
-      "link": "",
-      "post": ""
+      "link": "رخصة إم أي تي ",
+      "post": "وهو ما يعني باختصار أنه يمكن لأي شخص استخدامها دون قيود."
     },
-    "noteItems": "",
-    "atleastOneLibItem": ""
+    "noteItems": "يجب أن يكون لكل عنصر مكتبة اسمه الخاص حتى يكون قابلاً للتصفية. سيتم تضمين عناصر المكتبة التالية:",
+    "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": "",
-    "link": ""
+    "title": "تم إرسال المكتبة",
+    "content": "شكرا لك {{authorName}}. لقد تم إرسال مكتبتك للمراجعة. يمكنك تتبع الحالة",
+    "link": "هنا"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "إعادة ضبط المكتبة",
+    "removeItemsFromLib": "إزالة العناصر المحددة من المكتبة"
   },
   "encrypted": {
     "tooltip": "رسوماتك مشفرة من النهاية إلى النهاية حتى أن خوادم Excalidraw لن تراها أبدا.",
@@ -345,7 +374,7 @@
     "width": "العرض"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "تمت الاضافة الى المكتبة!",
     "copyStyles": "نسخت الانماط.",
     "copyToClipboard": "نسخ إلى الحافظة.",
     "copyToClipboardAsPng": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة PNG\n({{exportColorScheme}})",

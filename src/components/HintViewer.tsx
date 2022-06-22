@@ -7,9 +7,11 @@ import { AppState } from "../types";
 import {
   isImageElement,
   isLinearElement,
+  isTextBindableContainer,
   isTextElement,
 } from "../element/typeChecks";
 import { getShortcutKey } from "../utils";
+import { isEraserActive } from "../appState";
 
 interface HintViewerProps {
   appState: AppState;
@@ -18,25 +20,32 @@ interface HintViewerProps {
 }
 
 const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
-  const { elementType, isResizing, isRotating, lastPointerDownWith } = appState;
+  const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
-  if (elementType === "arrow" || elementType === "line") {
+  if (appState.isLibraryOpen) {
+    return null;
+  }
+
+  if (isEraserActive(appState)) {
+    return t("hints.eraserRevert");
+  }
+  if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (!multiMode) {
       return t("hints.linearElement");
     }
     return t("hints.linearElementMulti");
   }
 
-  if (elementType === "freedraw") {
+  if (activeTool.type === "freedraw") {
     return t("hints.freeDraw");
   }
 
-  if (elementType === "text") {
+  if (activeTool.type === "text") {
     return t("hints.text");
   }
 
-  if (appState.elementType === "image" && appState.pendingImageElement) {
+  if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
     return t("hints.placeImage");
   }
 
@@ -60,15 +69,6 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.rotate");
   }
 
-  if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-    if (appState.editingLinearElement) {
-      return appState.editingLinearElement.activePointIndex
-        ? t("hints.lineEditor_pointSelected")
-        : t("hints.lineEditor_nothingSelected");
-    }
-    return t("hints.lineEditor_info");
-  }
-
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
     return t("hints.text_selected");
   }
@@ -77,8 +77,31 @@ const getHints = ({ appState, elements, isMobile }: HintViewerProps) => {
     return t("hints.text_editing");
   }
 
-  if (elementType === "selection" && !selectedElements.length && !isMobile) {
-    return t("hints.canvasPanning");
+  if (activeTool.type === "selection") {
+    if (
+      appState.draggingElement?.type === "selection" &&
+      !appState.editingElement &&
+      !appState.editingLinearElement
+    ) {
+      return t("hints.deepBoxSelect");
+    }
+    if (!selectedElements.length && !isMobile) {
+      return t("hints.canvasPanning");
+    }
+  }
+
+  if (selectedElements.length === 1) {
+    if (isLinearElement(selectedElements[0])) {
+      if (appState.editingLinearElement) {
+        return appState.editingLinearElement.selectedPointsIndices
+          ? t("hints.lineEditor_pointSelected")
+          : t("hints.lineEditor_nothingSelected");
+      }
+      return t("hints.lineEditor_info");
+    }
+    if (isTextBindableContainer(selectedElements[0])) {
+      return t("hints.bindTextToElement");
+    }
   }
 
   return null;

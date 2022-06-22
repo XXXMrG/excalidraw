@@ -1,5 +1,5 @@
 import { Point } from "../types";
-import { FONT_FAMILY, THEME } from "../constants";
+import { FONT_FAMILY, THEME, VERTICAL_ALIGN } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
@@ -12,7 +12,9 @@ export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeSharpness = "round" | "sharp";
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = "left" | "center" | "right";
-export type VerticalAlign = "top" | "middle";
+
+type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
+export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -43,10 +45,17 @@ type _ExcalidrawElementBase = Readonly<{
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
-  /** Ids of (linear) elements that are bound to this element. */
-  boundElementIds: readonly ExcalidrawLinearElement["id"][] | null;
+  /** other elements that are bound to this element */
+  boundElements:
+    | readonly Readonly<{
+        id: ExcalidrawLinearElement["id"];
+        type: "arrow" | "text";
+      }>[]
+    | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
+  link: string | null;
+  locked: boolean;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -116,6 +125,8 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
+    containerId: ExcalidrawGenericElement["id"] | null;
+    originalText: string;
   }>;
 
 export type ExcalidrawBindableElement =
@@ -124,6 +135,16 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement;
+
+export type ExcalidrawTextContainer =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawImageElement;
+
+export type ExcalidrawTextElementWithContainer = {
+  containerId: ExcalidrawTextContainer["id"];
+} & ExcalidrawTextElement;
 
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];

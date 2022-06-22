@@ -8,7 +8,7 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
+import { calculateScrollCenter, getSelectedElements } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import CollabButton from "./CollabButton";
@@ -17,6 +17,7 @@ import { LockButton } from "./LockButton";
 import { UserList } from "./UserList";
 import { BackgroundPickerAndDarkModeToggle } from "./BackgroundPickerAndDarkModeToggle";
 import { LibraryButton } from "./LibraryButton";
+import { PenModeButton } from "./PenModeButton";
 
 type MobileMenuProps = {
   appState: AppState;
@@ -28,9 +29,13 @@ type MobileMenuProps = {
   libraryMenu: JSX.Element | null;
   onCollabButtonClick?: () => void;
   onLockToggle: () => void;
+  onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
+  renderCustomFooter?: (
+    isMobile: boolean,
+    appState: AppState,
+  ) => JSX.Element | null;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
@@ -38,6 +43,7 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: AppState,
   ) => JSX.Element | null;
+  renderStats: () => JSX.Element | null;
 };
 
 export const MobileMenu = ({
@@ -50,6 +56,7 @@ export const MobileMenu = ({
   setAppState,
   onCollabButtonClick,
   onLockToggle,
+  onPenModeToggle,
   canvas,
   isCollaborating,
   renderCustomFooter,
@@ -57,6 +64,7 @@ export const MobileMenu = ({
   showThemeBtn,
   onImageAction,
   renderTopRightUI,
+  renderStats,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -64,13 +72,14 @@ export const MobileMenu = ({
         <Section heading="shapes">
           {(heading) => (
             <Stack.Col gap={4} align="center">
-              <Stack.Row gap={1}>
-                <Island padding={1}>
+              <Stack.Row gap={1} className="App-toolbar-container">
+                <Island padding={1} className="App-toolbar">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
+                      appState={appState}
                       canvas={canvas}
-                      elementType={appState.elementType}
+                      activeTool={appState.activeTool}
                       setAppState={setAppState}
                       onImageAction={({ pointerType }) => {
                         onImageAction({
@@ -82,11 +91,23 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <LockButton
-                  checked={appState.elementLocked}
+                  checked={appState.activeTool.locked}
                   onChange={onLockToggle}
                   title={t("toolBar.lock")}
+                  isMobile
                 />
-                <LibraryButton appState={appState} setAppState={setAppState} />
+                <LibraryButton
+                  appState={appState}
+                  setAppState={setAppState}
+                  isMobile
+                />
+                <PenModeButton
+                  checked={appState.penMode}
+                  onChange={onPenModeToggle}
+                  title={t("toolBar.penMode")}
+                  isMobile
+                  penDetected={appState.penDetected}
+                />
               </Stack.Row>
               {libraryMenu}
             </Stack.Col>
@@ -98,6 +119,12 @@ export const MobileMenu = ({
   };
 
   const renderAppToolbar = () => {
+    // Render eraser conditionally in mobile
+    const showEraser =
+      !appState.viewModeEnabled &&
+      !appState.editingElement &&
+      getSelectedElements(elements, appState).length === 0;
+
     if (viewModeEnabled) {
       return (
         <div className="App-toolbar-content">
@@ -105,12 +132,16 @@ export const MobileMenu = ({
         </div>
       );
     }
+
     return (
       <div className="App-toolbar-content">
         {actionManager.renderAction("toggleCanvasMenu")}
         {actionManager.renderAction("toggleEditMenu")}
+
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
+        {showEraser && actionManager.renderAction("eraser")}
+
         {actionManager.renderAction(
           appState.multiElement ? "finalize" : "duplicateSelection",
         )}
@@ -155,6 +186,7 @@ export const MobileMenu = ({
   return (
     <>
       {!viewModeEnabled && renderToolbar()}
+      {renderStats()}
       <div
         className="App-bottom-bar"
         style={{
@@ -173,20 +205,11 @@ export const MobileMenu = ({
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
-                      <UserList mobile>
-                        {Array.from(appState.collaborators)
-                          // Collaborator is either not initialized or is actually the current user.
-                          .filter(
-                            ([_, client]) => Object.keys(client).length !== 0,
-                          )
-                          .map(([clientId, client]) => (
-                            <React.Fragment key={clientId}>
-                              {actionManager.renderAction("goToCollaborator", {
-                                id: clientId,
-                              })}
-                            </React.Fragment>
-                          ))}
-                      </UserList>
+                      <UserList
+                        mobile
+                        collaborators={appState.collaborators}
+                        actionManager={actionManager}
+                      />
                     </fieldset>
                   )}
                 </Stack.Col>
@@ -200,7 +223,7 @@ export const MobileMenu = ({
                 appState={appState}
                 elements={elements}
                 renderAction={actionManager.renderAction}
-                elementType={appState.elementType}
+                activeTool={appState.activeTool.type}
               />
             </Section>
           ) : null}

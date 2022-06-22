@@ -40,7 +40,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "ellipse",
-    key: KEYS.E,
+    key: KEYS.O,
   },
   {
     icon: (
@@ -80,7 +80,7 @@ export const SHAPES = [
       </svg>
     ),
     value: "freedraw",
-    key: KEYS.X,
+    key: [KEYS.X, KEYS.P.toUpperCase()],
   },
   {
     icon: (

@@ -8,6 +8,15 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { getNonDeletedElements } from "../element";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
+import { encodePngMetadata } from "../data/image";
+import { serializeAsJSON } from "../data/json";
+import {
+  copyBlobToClipboardAsPng,
+  copyTextToSystemClipboard,
+  copyToClipboard,
+} from "../clipboard";
+
+export { MIME_TYPES };
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
@@ -79,9 +88,7 @@ export const exportToBlob = async (
     mimeType?: string;
     quality?: number;
   },
-): Promise<Blob | null> => {
-  const canvas = await exportToCanvas(opts);
-
+): Promise<Blob> => {
   let { mimeType = MIME_TYPES.png, quality } = opts;
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
@@ -93,11 +100,41 @@ export const exportToBlob = async (
     mimeType = MIME_TYPES.jpg;
   }
 
+  if (mimeType === MIME_TYPES.jpg && !opts.appState?.exportBackground) {
+    console.warn(
+      `Defaulting "exportBackground" to "true" for "${MIME_TYPES.jpg}" mimeType`,
+    );
+    opts = {
+      ...opts,
+      appState: { ...opts.appState, exportBackground: true },
+    };
+  }
+
+  const canvas = await exportToCanvas(opts);
+
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     canvas.toBlob(
-      (blob: Blob | null) => {
+      async (blob) => {
+        if (!blob) {
+          return reject(new Error("couldn't export to blob"));
+        }
+        if (
+          blob &&
+          mimeType === MIME_TYPES.png &&
+          opts.appState?.exportEmbedScene
+        ) {
+          blob = await encodePngMetadata({
+            blob,
+            metadata: serializeAsJSON(
+              opts.elements,
+              opts.appState,
+              opts.files || {},
+              "local",
+            ),
+          });
+        }
         resolve(blob);
       },
       mimeType,
@@ -129,6 +166,38 @@ export const exportToSvg = async ({
   );
 };
 
-export { serializeAsJSON } from "../data/json";
-export { loadFromBlob, loadLibraryFromBlob } from "../data/blob";
+export const exportToClipboard = async (
+  opts: ExportOpts & {
+    mimeType?: string;
+    quality?: number;
+    type: "png" | "svg" | "json";
+  },
+) => {
+  if (opts.type === "svg") {
+    const svg = await exportToSvg(opts);
+    await copyTextToSystemClipboard(svg.outerHTML);
+  } else if (opts.type === "png") {
+    await copyBlobToClipboardAsPng(exportToBlob(opts));
+  } else if (opts.type === "json") {
+    const appState = {
+      offsetTop: 0,
+      offsetLeft: 0,
+      width: 0,
+      height: 0,
+      ...getDefaultAppState(),
+      ...opts.appState,
+    };
+    await copyToClipboard(opts.elements, appState, opts.files);
+  } else {
+    throw new Error("Invalid export type");
+  }
+};
+
+export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
+export {
+  loadFromBlob,
+  loadSceneOrLibraryFromBlob,
+  loadLibraryFromBlob,
+} from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
+export { mergeLibraryItems } from "../data/library";

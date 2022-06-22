@@ -9,6 +9,7 @@
     "copy": "کپی",
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
+    "copyText": "",
     "bringForward": "جلو آوردن",
     "sendToBack": "پس فرستادن",
     "bringToFront": "جلو آوردن",
@@ -64,6 +65,7 @@
     "cartoonist": "کارتونیست",
     "fileTitle": "نام فایل",
     "colorPicker": "انتخابگر رنگ",
+    "canvasColors": "",
     "canvasBackground": "بوم",
     "drawingCanvas": "بوم نقاشی",
     "layers": "لایه ها",
@@ -102,7 +104,23 @@
     "showBackground": "نمایش انتخاب کننده رنگ پس زمینه",
     "toggleTheme": "تغییر تم",
     "personalLib": "",
-    "excalidrawLib": ""
+    "excalidrawLib": "",
+    "decreaseFontSize": "",
+    "increaseFontSize": "",
+    "unbindText": "",
+    "bindText": "",
+    "link": {
+      "edit": "",
+      "create": "",
+      "label": ""
+    },
+    "elementLock": {
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -150,12 +168,11 @@
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
-    "couldNotCopyToClipboard": "کپی نشد. از مرورگر Chrome استفاده کنید.",
+    "couldNotCopyToClipboard": "",
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "collabStopOverridePrompt": "",
-    "errorLoadingLibrary": "خطایی در بارگذاری کتابخانه ثالث وجود داشت.",
     "errorAddingToLibrary": "مورد به کتابخانه اضافه نشد",
     "errorRemovingFromLibrary": "مورد از کتابخانه حذف نشد",
     "confirmAddLibrary": "{{numShapes}} از اشکال به کتابخانه شما اضافه خواهد شد. مطمئن هستید؟",
@@ -171,7 +188,9 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
-    "invalidSVGString": ""
+    "invalidSVGString": "",
+    "cannotResolveCollabServer": "",
+    "importLibraryError": ""
   },
   "toolBar": {
     "selection": "گزینش",
@@ -184,7 +203,10 @@
     "freedraw": "کشیدن",
     "text": "متن",
     "library": "کتابخانه",
-    "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار"
+    "lock": "ابزار انتخاب شده را بعد از کشیدن نگه دار",
+    "penMode": "",
+    "link": "",
+    "eraser": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -204,10 +226,13 @@
     "resizeImage": "",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
     "lineEditor_info": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
-    "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید.",
-    "lineEditor_nothingSelected": "یک نقطه را برای جابجایی یا حذف انتخاب کنید یا کلید Alt بگیرید و کلیک کنید تا بتوانید یک نقطه جدید اضافه کنید",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": ""
+    "publishLibrary": "",
+    "bindTextToElement": "",
+    "deepBoxSelect": "",
+    "eraserRevert": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -254,6 +279,8 @@
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
     "click": "کلیک",
+    "deepSelect": "",
+    "deepBoxSelect": "",
     "curvedArrow": "فلش خمیده",
     "curvedLine": "منحنی",
     "documentation": "مستندات",
@@ -265,14 +292,15 @@
     "howto": "راهنمای ما را دنبال کنید",
     "or": "یا",
     "preventBinding": "مانع شدن از چسبیدن فلش ها",
-    "shapes": "شکل‌ها",
+    "tools": "",
     "shortcuts": "میانبرهای صفحه کلید",
     "textFinish": "پایان ویرایش (ویرایشگر متن)",
     "textNewLine": "افزودن خط جدید (ویرایشگر متن)",
     "title": "راهنما",
     "view": "مشاهده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
-    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده"
+    "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
+    "toggleElementLock": ""
   },
   "clearCanvasDialog": {
     "title": ""
@@ -314,7 +342,8 @@
       "post": ""
     },
     "noteItems": "",
-    "atleastOneLibItem": ""
+    "atleastOneLibItem": "",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",

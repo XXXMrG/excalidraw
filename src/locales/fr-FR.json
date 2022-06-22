@@ -9,6 +9,7 @@
     "copy": "Copier",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
+    "copyText": "Copier dans le presse-papier en tant que texte",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Mettre en arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -43,7 +44,7 @@
     "exportEmbedScene": "Intégrer la scène",
     "exportEmbedScene_details": "Les données de scène seront enregistrées dans le fichier PNG/SVG exporté, afin que la scène puisse être restaurée à partir de celui-ci.\nCela augmentera la taille du fichier exporté.",
     "addWatermark": "Ajouter \"Fait avec Excalidraw\"",
-    "handDrawn": "Manuscrit",
+    "handDrawn": "À la main",
     "normal": "Normale",
     "code": "Code",
     "small": "Petit",
@@ -64,6 +65,7 @@
     "cartoonist": "Caricaturiste",
     "fileTitle": "Nom du fichier",
     "colorPicker": "Sélecteur de couleur",
+    "canvasColors": "Utilisé sur la zone de dessin",
     "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Zone de dessin",
     "layers": "Calques",
@@ -102,7 +104,23 @@
     "showBackground": "Afficher le sélecteur de couleur d'arrière-plan",
     "toggleTheme": "Changer le thème",
     "personalLib": "Bibliothèque personnelle",
-    "excalidrawLib": "Bibliothèque Excalidraw"
+    "excalidrawLib": "Bibliothèque Excalidraw",
+    "decreaseFontSize": "Réduire la taille de police",
+    "increaseFontSize": "Augmenter la taille de police",
+    "unbindText": "Délier le texte",
+    "bindText": "Lier le texte au conteneur",
+    "link": {
+      "edit": "Modifier le lien",
+      "create": "Créer un lien",
+      "label": "Lien"
+    },
+    "elementLock": {
+      "lock": "Verrouiller",
+      "unlock": "Déverrouiller",
+      "lockAll": "Tout verrouiller",
+      "unlockAll": "Tout déverouiller"
+    },
+    "statusPublished": ""
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -150,12 +168,11 @@
     "couldNotLoadInvalidFile": "Impossible de charger un fichier invalide",
     "importBackendFailed": "L'importation depuis le backend a échoué.",
     "cannotExportEmptyCanvas": "Impossible d'exporter un canevas vide.",
-    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papier. Essayez d'utiliser le navigateur Chrome.",
+    "couldNotCopyToClipboard": "Impossible de copier dans le presse-papiers.",
     "decryptFailed": "Les données n'ont pas pu être déchiffrées.",
     "uploadedSecurly": "Le téléchargement a été sécurisé avec un chiffrement de bout en bout, ce qui signifie que ni Excalidraw ni personne d'autre ne peut en lire le contenu.",
     "loadSceneOverridePrompt": "Le chargement d'un dessin externe remplacera votre contenu actuel. Souhaitez-vous continuer ?",
     "collabStopOverridePrompt": "Arrêter la session écrasera votre précédent dessin stocké localement. Êtes-vous sûr·e ?\n\n(Si vous voulez garder votre dessin local, fermez simplement l'onglet du navigateur à la place.)",
-    "errorLoadingLibrary": "Une erreur s'est produite lors du chargement de la bibliothèque tierce.",
     "errorAddingToLibrary": "Impossible d'ajouter l'élément à la bibliothèque",
     "errorRemovingFromLibrary": "Impossible de retirer l'élément de la bibliothèque",
     "confirmAddLibrary": "Cela va ajouter {{numShapes}} forme(s) à votre bibliothèque. Êtes-vous sûr·e ?",
@@ -171,7 +188,9 @@
     "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
-    "invalidSVGString": "SVG invalide."
+    "invalidSVGString": "SVG invalide.",
+    "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
+    "importLibraryError": "Impossible de charger la bibliothèque"
   },
   "toolBar": {
     "selection": "Sélection",
@@ -184,7 +203,10 @@
     "freedraw": "Dessiner",
     "text": "Texte",
     "library": "Bibliothèque",
-    "lock": "Garder l'outil sélectionné actif après le dessin"
+    "lock": "Garder l'outil sélectionné actif après le dessin",
+    "penMode": "Empêcher le zoom tactile et accepter la saisie libre uniquement à partir du stylet",
+    "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
+    "eraser": "Gomme"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -204,10 +226,13 @@
     "resizeImage": "Vous pouvez redimensionner librement en maintenant SHIFT,\nmaintenez ALT pour redimensionner depuis le centre",
     "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
     "lineEditor_info": "Double-cliquez ou appuyez sur Entrée pour éditer les points",
-    "lineEditor_pointSelected": "Appuyez sur Supprimer pour supprimer le point, Ctrl ou Cmd+D pour le dupliquer, ou faites-le glisser pour le déplacer",
-    "lineEditor_nothingSelected": "Sélectionnez un point à déplacer ou supprimer, ou maintenez Alt et cliquez pour ajouter de nouveaux points",
+    "lineEditor_pointSelected": "Appuyer sur Suppr. pour supprimer des points, Ctrl ou Cmd+D pour dupliquer, ou faire glisser pour déplacer",
+    "lineEditor_nothingSelected": "Sélectionner un point pour éditer (maintenir la touche MAJ pour en sélectionner plusieurs),\nou maintenir la touche Alt enfoncée et cliquer pour ajouter de nouveaux points",
     "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
-    "publishLibrary": "Publier votre propre bibliothèque"
+    "publishLibrary": "Publier votre propre bibliothèque",
+    "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
+    "deepBoxSelect": "Maintenir CtrlOuCmd pour sélectionner dans les groupes, et empêcher le déplacement",
+    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression"
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -254,6 +279,8 @@
   "helpDialog": {
     "blog": "Lire notre blog",
     "click": "clic",
+    "deepSelect": "Sélection dans les groupes",
+    "deepBoxSelect": "Sélectionner dans les groupes, et empêcher le déplacement",
     "curvedArrow": "Flèche courbée",
     "curvedLine": "Ligne courbée",
     "documentation": "Documentation",
@@ -265,14 +292,15 @@
     "howto": "Suivez nos guides",
     "or": "ou",
     "preventBinding": "Empêcher la liaison de flèche",
-    "shapes": "Formes",
+    "tools": "Outils",
     "shortcuts": "Raccourcis clavier",
     "textFinish": "Terminer l'édition (éditeur de texte)",
     "textNewLine": "Ajouter une nouvelle ligne (éditeur de texte)",
     "title": "Aide",
     "view": "Affichage",
     "zoomToFit": "Zoomer pour voir tous les éléments",
-    "zoomToSelection": "Zoomer sur la sélection"
+    "zoomToSelection": "Zoomer sur la sélection",
+    "toggleElementLock": "Verrouiller/déverrouiller la sélection"
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
@@ -314,7 +342,8 @@
       "post": "ce qui en gros signifie que tout le monde peut l'utiliser sans restrictions."
     },
     "noteItems": "Chaque élément de la bibliothèque doit avoir son propre nom afin qu'il soit filtrable. Les éléments de bibliothèque suivants seront inclus :",
-    "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer"
+    "atleastOneLibItem": "Veuillez sélectionner au moins un élément de bibliothèque pour commencer",
+    "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "Bibliothèque soumise",

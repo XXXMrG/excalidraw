@@ -185,7 +185,7 @@ const getLinearElementAbsoluteCoords = (
       maxY + element.y,
     ];
   } else {
-    const shape = getShapeForElement(element) as Drawable[];
+    const shape = getShapeForElement(element)!;
 
     // first element is always the curve
     const ops = getCurvePathOps(shape[0]);
@@ -326,7 +326,7 @@ const getLinearElementRotatedBounds = (
     return [minX, minY, maxX, maxY];
   }
 
-  const shape = getShapeForElement(element) as Drawable[];
+  const shape = getShapeForElement(element)!;
 
   // first element is always the curve
   const ops = getCurvePathOps(shape[0]);
@@ -520,11 +520,24 @@ export interface Box {
   minY: number;
   maxX: number;
   maxY: number;
+  midX: number;
+  midY: number;
+  width: number;
+  height: number;
 }
 
 export const getCommonBoundingBox = (
   elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
 ): Box => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return { minX, minY, maxX, maxY };
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+    midX: (minX + maxX) / 2,
+    midY: (minY + maxY) / 2,
+  };
 };

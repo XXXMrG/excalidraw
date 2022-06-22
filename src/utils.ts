@@ -1,14 +1,20 @@
+import oc from "open-color";
+
 import colors from "./colors";
 import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
+  EVENT,
   FONT_FAMILY,
+  MIME_TYPES,
+  THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { Zoom } from "./types";
+import { AppState, DataURL, LastActiveToolBeforeEraser, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
+import { SHAPES } from "./shapes";
 
 let mockDateTime: string | null = null;
 
@@ -90,37 +96,6 @@ export const getFontString = ({
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };
 
-// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-export const measureText = (text: string, font: FontString) => {
-  const line = document.createElement("div");
-  const body = document.body;
-  line.style.position = "absolute";
-  line.style.whiteSpace = "pre";
-  line.style.font = font;
-  body.appendChild(line);
-  line.innerText = text
-    .split("\n")
-    // replace empty lines with single space because leading/trailing empty
-    // lines would be stripped from computation
-    .map((x) => x || " ")
-    .join("\n");
-  const width = line.offsetWidth;
-  const height = line.offsetHeight;
-  // Now creating 1px sized item that will be aligned to baseline
-  // to calculate baseline shift
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  line.appendChild(span);
-  // Baseline is important for positioning text on canvas
-  const baseline = span.offsetTop + span.offsetHeight;
-  document.body.removeChild(line);
-
-  return { width, height, baseline };
-};
-
 export const debounce = <T extends any[]>(
   fn: (...args: T) => void,
   timeout: number,
@@ -146,6 +121,53 @@ export const debounce = <T extends any[]>(
   ret.cancel = () => {
     lastArgs = null;
     clearTimeout(handle);
+  };
+  return ret;
+};
+
+// throttle callback to execute once per animation frame
+export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+  let handle: number | null = null;
+  let lastArgs: T | null = null;
+  let callback: ((...args: T) => void) | null = null;
+  const ret = (...args: T) => {
+    if (process.env.NODE_ENV === "test") {
+      fn(...args);
+      return;
+    }
+    lastArgs = args;
+    callback = fn;
+    if (handle === null) {
+      handle = window.requestAnimationFrame(() => {
+        handle = null;
+        lastArgs = null;
+        callback = null;
+        fn(...args);
+      });
+    }
+  };
+  ret.flush = () => {
+    if (handle !== null) {
+      cancelAnimationFrame(handle);
+      handle = null;
+    }
+    if (lastArgs) {
+      const _lastArgs = lastArgs;
+      const _callback = callback;
+      lastArgs = null;
+      callback = null;
+      if (_callback !== null) {
+        _callback(..._lastArgs);
+      }
+    }
+  };
+  ret.cancel = () => {
+    lastArgs = null;
+    callback = null;
+    if (handle !== null) {
+      cancelAnimationFrame(handle);
+      handle = null;
+    }
   };
   return ret;
 };
@@ -186,6 +208,32 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const updateActiveTool = (
+  appState: Pick<AppState, "activeTool">,
+  data: (
+    | { type: typeof SHAPES[number]["value"] | "eraser" }
+    | { type: "custom"; customType: string }
+  ) & { lastActiveToolBeforeEraser?: LastActiveToolBeforeEraser },
+): AppState["activeTool"] => {
+  if (data.type === "custom") {
+    return {
+      ...appState.activeTool,
+      type: "custom",
+      customType: data.customType,
+    };
+  }
+
+  return {
+    ...appState.activeTool,
+    lastActiveToolBeforeEraser:
+      data.lastActiveToolBeforeEraser === undefined
+        ? appState.activeTool.lastActiveToolBeforeEraser
+        : data.lastActiveToolBeforeEraser,
+    type: data.type,
+    customType: null,
+  };
+};
+
 export const resetCursor = (canvas: HTMLCanvasElement | null) => {
   if (canvas) {
     canvas.style.cursor = "";
@@ -198,18 +246,63 @@ export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
   }
 };
 
+let eraserCanvasCache: any;
+let previewDataURL: string;
+export const setEraserCursor = (
+  canvas: HTMLCanvasElement | null,
+  theme: AppState["theme"],
+) => {
+  const cursorImageSizePx = 20;
+
+  const drawCanvas = () => {
+    const isDarkTheme = theme === THEME.DARK;
+    eraserCanvasCache = document.createElement("canvas");
+    eraserCanvasCache.theme = theme;
+    eraserCanvasCache.height = cursorImageSizePx;
+    eraserCanvasCache.width = cursorImageSizePx;
+    const context = eraserCanvasCache.getContext("2d")!;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.arc(
+      eraserCanvasCache.width / 2,
+      eraserCanvasCache.height / 2,
+      5,
+      0,
+      2 * Math.PI,
+    );
+    context.fillStyle = isDarkTheme ? oc.black : oc.white;
+    context.fill();
+    context.strokeStyle = isDarkTheme ? oc.white : oc.black;
+    context.stroke();
+    previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
+  };
+  if (!eraserCanvasCache || eraserCanvasCache.theme !== theme) {
+    drawCanvas();
+  }
+
+  setCursor(
+    canvas,
+    `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
+      cursorImageSizePx / 2
+    }, auto`,
+  );
+};
+
 export const setCursorForShape = (
   canvas: HTMLCanvasElement | null,
-  shape: string,
+  appState: AppState,
 ) => {
   if (!canvas) {
     return;
   }
-  if (shape === "selection") {
+  if (appState.activeTool.type === "selection") {
     resetCursor(canvas);
+  } else if (appState.activeTool.type === "eraser") {
+    setEraserCursor(canvas, appState.theme);
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
-  } else if (shape !== "image") {
+    // Ignore custom type as well and let host decide
+  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
 };
@@ -254,8 +347,9 @@ export const viewportCoordsToSceneCoords = (
   },
 ) => {
   const invScale = 1 / zoom.value;
-  const x = (clientX - zoom.translation.x - offsetLeft) * invScale - scrollX;
-  const y = (clientY - zoom.translation.y - offsetTop) * invScale - scrollY;
+  const x = (clientX - offsetLeft) * invScale - scrollX;
+  const y = (clientY - offsetTop) * invScale - scrollY;
+
   return { x, y };
 };
 
@@ -275,8 +369,8 @@ export const sceneCoordsToViewportCoords = (
     scrollY: number;
   },
 ) => {
-  const x = (sceneX + scrollX + offsetLeft) * zoom.value + zoom.translation.x;
-  const y = (sceneY + scrollY + offsetTop) * zoom.value + zoom.translation.y;
+  const x = (sceneX + scrollX) * zoom.value + offsetLeft;
+  const y = (sceneY + scrollY) * zoom.value + offsetTop;
   return { x, y };
 };
 
@@ -386,6 +480,21 @@ export const withBatchedUpdates = <
     unstable_batchedUpdates(func as TFunction, event);
   }) as TFunction;
 
+/**
+ * barches React state updates and throttles the calls to a single call per
+ * animation frame
+ */
+export const withBatchedUpdatesThrottled = <
+  TFunction extends ((event: any) => void) | (() => void),
+>(
+  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+) => {
+  // @ts-ignore
+  return throttleRAF<Parameters<TFunction>>(((event) => {
+    unstable_batchedUpdates(func, event);
+  }) as TFunction);
+};
+
 //https://stackoverflow.com/a/9462382/8418
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
@@ -442,7 +551,9 @@ export const getNearestScrollableContainer = (
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
-      (overflowY === "auto" || overflowY === "scroll")
+      (overflowY === "auto" ||
+        overflowY === "scroll" ||
+        overflowY === "overlay")
     ) {
       return parent;
     }
@@ -474,8 +585,7 @@ export const bytesToHexString = (bytes: Uint8Array) => {
     .join("");
 };
 
-export const getUpdatedTimestamp = () =>
-  process.env.NODE_ENV === "test" ? 1 : Date.now();
+export const getUpdatedTimestamp = () => (isTestEnv() ? 1 : Date.now());
 
 /**
  * Transforms array of objects containing `id` attribute,
@@ -488,4 +598,73 @@ export const arrayToMap = <T extends { id: string } | string>(
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
   }, new Map());
+};
+
+export const isTestEnv = () =>
+  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+
+export const isProdEnv = () =>
+  typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+
+export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
+  return new CustomEvent(name, {
+    detail: {
+      nativeEvent,
+    },
+    cancelable: true,
+  });
+};
+
+export const updateObject = <T extends Record<string, any>>(
+  obj: T,
+  updates: Partial<T>,
+): T => {
+  let didChange = false;
+  for (const key in updates) {
+    const value = (updates as any)[key];
+    if (typeof value !== "undefined") {
+      if (
+        (obj as any)[key] === value &&
+        // if object, always update because its attrs could have changed
+        (typeof value !== "object" || value === null)
+      ) {
+        continue;
+      }
+      didChange = true;
+    }
+  }
+
+  if (!didChange) {
+    return obj;
+  }
+
+  return {
+    ...obj,
+    ...updates,
+  };
+};
+
+export const isPrimitive = (val: any) => {
+  const type = typeof val;
+  return val == null || (type !== "object" && type !== "function");
+};
+
+export const getFrame = () => {
+  try {
+    return window.self === window.top ? "top" : "iframe";
+  } catch (error) {
+    return "iframe";
+  }
+};
+
+export const isPromiseLike = (
+  value: any,
+): value is Promise<ResolutionType<typeof value>> => {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    "then" in value &&
+    "catch" in value &&
+    "finally" in value
+  );
 };

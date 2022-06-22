@@ -3,7 +3,7 @@
 .excalidraw {
   .library-unit {
     align-items: center;
-    border: 1px solid var(--button-gray-2);
+    border: 1px solid transparent;
     display: flex;
     justify-content: center;
     position: relative;
@@ -21,12 +21,10 @@
     }
   }
 
-  &.theme--dark .library-unit {
-    border-color: rgb(48, 48, 48);
-  }
-
   .library-unit__dragger {
     display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
     width: 100%;
   }

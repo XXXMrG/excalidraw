@@ -13,6 +13,8 @@ import { isInitializedImageElement } from "../../element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
 import { MIME_TYPES } from "../../constants";
+import { trackEvent } from "../../analytics";
+import { getFrame } from "../../utils";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -78,7 +80,7 @@ export const ExportToExcalidrawPlus: React.FC<{
   onError: (error: Error) => void;
 }> = ({ elements, appState, files, onError }) => {
   return (
-    <Card color="indigo">
+    <Card color="primary">
       <div className="Card-icon">{excalidrawPlusIcon}</div>
       <h2>Excalidraw+</h2>
       <div className="Card-details">
@@ -92,6 +94,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         showAriaLabel={true}
         onClick={async () => {
           try {
+            trackEvent("export", "eplus", `ui (${getFrame()})`);
             await exportToExcalidrawPlus(elements, appState, files);
           } catch (error: any) {
             console.error(error);
